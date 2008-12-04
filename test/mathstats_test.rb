@@ -39,6 +39,18 @@ class TC_MyTest < Test::Unit::TestCase
     
     assert_equal(3, Mathstats::Lib.sum([1,2]))
   end
+  
+  def test_variance_as_module
+    assert_equal 30, [4, 7, 13, 16].variance
+    assert_equal 30, [4, 7, 13, 16].map {|n| 10**8 + n }.variance
+    assert_equal 30, [4, 7, 13, 16].map {|n| 10**9 + n }.variance
+  end
+
+  def test_variance_as_class
+    assert_equal 30, Mathstats::Lib.variance([4, 7, 13, 16])
+    assert_equal 30, Mathstats::Lib.variance([4, 7, 13, 16].map {|n| 10**8 + n })
+    assert_equal 30, Mathstats::Lib.variance([4, 7, 13, 16].map {|n| 10**9 + n })
+  end
 
   # def teardown
   # end
