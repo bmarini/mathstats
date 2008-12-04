@@ -2,10 +2,11 @@ require 'test/unit'
 require 'mathstats'
 
 class TC_MyTest < Test::Unit::TestCase
-  # def setup
-  # end
-  def test_average_as_module
+  def setup
     Array.send :include, Mathstats
+  end
+  
+  def test_average_as_module
     assert_equal 3, [1,2,3,4,5].average
     assert_equal(6, [1,2,3,4,5].average {|n| n * 2 })
     assert_equal(0, [].average(0))
@@ -24,7 +25,6 @@ class TC_MyTest < Test::Unit::TestCase
   end
 
   def test_sum_as_module
-    Array.send :include, Mathstats
     assert_equal 10, [1,2,3,4].sum
     assert_equal(20, [1,2,3,4].sum {|n| n * 2 })
     assert_equal(0, [].sum(0))
@@ -50,6 +50,11 @@ class TC_MyTest < Test::Unit::TestCase
     assert_equal 30, Mathstats::Lib.variance([4, 7, 13, 16])
     assert_equal 30, Mathstats::Lib.variance([4, 7, 13, 16].map {|n| 10**8 + n })
     assert_equal 30, Mathstats::Lib.variance([4, 7, 13, 16].map {|n| 10**9 + n })
+  end
+  
+  def test_standard_deviation_as_module
+    assert_equal 6, [3,7,7,19].standard_deviation({:population => :finite})
+    assert_equal 6.93, ([3,7,7,19].standard_deviation * 100).round / 100.0
   end
 
   # def teardown

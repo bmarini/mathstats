@@ -4,6 +4,10 @@ module Mathstats
   end
   alias_method :average, :mean
   
+  def standard_deviation(options = {}, &block)
+    Lib.standard_deviation(self, options, &block)
+  end
+  
   def sum(identity = 0, &block)
     Lib.sum(self, identity, &block)
   end
@@ -20,6 +24,17 @@ module Mathstats
     
     # Poor man's alias_method until I figure out how to do this right
     def self.average(array, identity = 0, &block); mean(array, identity, &block); end
+    
+    def self.standard_deviation(array, options = {}, &block)
+      options = {:default => 0}.merge(options)
+      return options[:default] unless array.size > 0
+      
+      if block_given?
+        return standard_deviation( array.map(&block), options )
+      end
+      
+      Math.sqrt( variance(array, options) )
+    end
     
     def self.sum(array, identity = 0, &block)
       return identity unless array.size > 0
