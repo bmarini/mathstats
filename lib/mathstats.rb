@@ -46,11 +46,9 @@ module Mathstats
     
     def self.variance_two_pass(array, options)
       n        = array.size
-      denom    = options[:population] == :infinite ? n -1 : n
-      sum1     = sum(array)
+      denom    = options[:population] == :infinite ? n - 1 : n
       mean     = mean(array)
-      sum2     = array.inject(0) {|memo, element| memo + (element - mean)**2 }
-      variance = sum2 / denom
+      variance = array.inject(0) {|memo, element| memo + (element - mean)**2 } / denom
     end
 
   end
