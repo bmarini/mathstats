@@ -18,7 +18,7 @@ $ gem install bmarini-mathstats
 == Usage
 
 require 'rubygems'
-require 'bmarini-mathstats'
+require 'mathstats'
 
 Array.send :include, Mathstats
 [4,8,15,16,23,42].variance
