@@ -18,7 +18,7 @@ $ gem install mathstats
 
 require 'mathstats'
 
-Mathstats.attach_to(Array)
+Mathstats.attach_to(Array) # => Array.send :include, Mathstats::Mixin
 [4,8,15,16,23,42].variance
 
 # Or if you don't want to mess with the Array class

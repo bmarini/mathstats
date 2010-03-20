@@ -1,18 +1,4 @@
 class Mathstats
-  module ModuleMethods
-    def self.delegate_to_mathstats(*symbols)
-      Array(symbols).each do |symbol|
-        class_eval <<-EOS, __FILE__, __LINE__ + 1
-          def #{symbol}(*args, &block)
-            Mathstats.#{symbol}(self, *args, &block)
-          end
-        EOS
-      end
-    end
-
-    delegate_to_mathstats :mean, :average, :standard_deviation, :sum, :variance
-  end
-
   class << self
     def mean(array, identity = 0, &block)
       array.size > 0 ? sum(array, identity, &block) / array.size.to_f : identity
@@ -61,7 +47,25 @@ class Mathstats
     end
 
     def attach_to(klass)
-      klass.send :include, ModuleMethods
+      klass.send :include, Mixin
     end
+  end
+
+  # All the class methods from Mathstats above are available in the Mixin
+  # module, via delegation. This module can be included in any class that
+  # has a method `#to_a` like Array
+
+  module Mixin
+    def self.delegate_to_mathstats(*symbols)
+      Array(symbols).each do |symbol|
+        class_eval <<-EOS, __FILE__, __LINE__ + 1
+          def #{symbol}(*args, &block)
+            Mathstats.#{symbol}(self.to_a, *args, &block)
+          end
+        EOS
+      end
+    end
+
+    delegate_to_mathstats :mean, :average, :standard_deviation, :sum, :variance
   end
 end
