@@ -1,9 +1,3 @@
-begin
-  require 'rubygems'
-rescue Exception
-  nil
-end
-
 require 'rake/clean'
 require 'rake/testtask'
 
