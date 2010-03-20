@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name             = "mathstats"
-  s.version          = "0.9.1"
-  s.date             = "2008-11-07"
+  s.version          = "0.9.2"
+  s.date             = "2010-03-20"
   s.summary          = "Basic statistics methods for ruby available as a \
 mixin or standalone class"
   s.email            = "bmarini@gmail.com"
