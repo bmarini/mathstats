@@ -1,42 +1,36 @@
-module Mathstats
-  def mean(identity = 0, &block)
-    Lib.average(self, identity, &block)
+class Mathstats
+  module ModuleMethods
+    def self.delegate_to_mathstats(*symbols)
+      Array(symbols).each do |symbol|
+        class_eval <<-EOS, __FILE__, __LINE__ + 1
+          def #{symbol}(*args, &block)
+            Mathstats.#{symbol}(self, *args, &block)
+          end
+        EOS
+      end
+    end
+
+    delegate_to_mathstats :mean, :average, :standard_deviation, :sum, :variance
   end
-  alias_method :average, :mean
-  
-  def standard_deviation(options = {}, &block)
-    Lib.standard_deviation(self, options, &block)
-  end
-  
-  def sum(identity = 0, &block)
-    Lib.sum(self, identity, &block)
-  end
-  
-  def variance(options = {}, &block)
-    Lib.variance(self, options, &block)
-  end
-  
-  class Lib
-    
-    def self.mean(array, identity = 0, &block)
+
+  class << self
+    def mean(array, identity = 0, &block)
       array.size > 0 ? sum(array, identity, &block) / array.size.to_f : identity
     end
-    
-    # Poor man's alias_method until I figure out how to do this right
-    def self.average(array, identity = 0, &block); mean(array, identity, &block); end
-    
-    def self.standard_deviation(array, options = {}, &block)
+    alias_method :average, :mean
+
+    def standard_deviation(array, options = {}, &block)
       options = {:default => 0}.merge(options)
       return options[:default] unless array.size > 0
-      
+
       if block_given?
         return standard_deviation( array.map(&block), options )
       end
-      
+
       Math.sqrt( variance(array, options) )
     end
-    
-    def self.sum(array, identity = 0, &block)
+
+    def sum(array, identity = 0, &block)
       return identity unless array.size > 0
 
       if block_given?
@@ -48,23 +42,26 @@ module Mathstats
 
     # Two pass algorithm is currently the only algo supported
     # http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance
-    def self.variance(array, options = {}, &block)
+    def variance(array, options = {}, &block)
       options = {:default => 0, :algo => :two_pass, :population => :infinite}.merge(options)
       return options[:default] unless array.size > 0
-      
+
       if block_given?
         return variance( array.map(&block), options )
       end
-      
+
       variance_two_pass(array, options)
     end
-    
-    def self.variance_two_pass(array, options)
+
+    def variance_two_pass(array, options)
       n        = array.size
       denom    = options[:population] == :infinite ? n - 1 : n
       mean     = mean(array)
       variance = array.inject(0) {|memo, element| memo + (element - mean)**2 } / denom
     end
 
+    def attach_to(klass)
+      klass.send :include, ModuleMethods
+    end
   end
 end
