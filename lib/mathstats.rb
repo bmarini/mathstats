@@ -1,51 +1,65 @@
 class Mathstats
   class << self
-    def mean(array, identity = 0, &block)
-      array.size > 0 ? sum(array, identity, &block) / array.size.to_f : identity
+    # Calculates the mean (or average) from a set of values
+    #
+    # Normal usage:
+    #   Mathstats.mean([1,2,3,4,5]) # => 3.0
+    #
+    # With a default value when set is empty:
+    #   Mathstats.mean([], 0) # => 0.0
+    #
+    # With a block to modify values:
+    #   Mathstats.mean([1,2,3,4,5]) { |v| v - 1 } # => 2.5
+    def mean(values, identity = 0, &block)
+      values.size > 0 ? sum(values, identity, &block) / values.size.to_f : identity
     end
     alias_method :average, :mean
 
-    def standard_deviation(array, options = {}, &block)
+    # Calculates the standard deviation from a set of values
+    def standard_deviation(values, options = {}, &block)
       options = {:default => 0}.merge(options)
-      return options[:default] unless array.size > 0
+      return options[:default] unless values.size > 0
 
       if block_given?
-        return standard_deviation( array.map(&block), options )
+        return standard_deviation( values.map(&block), options )
       end
 
-      Math.sqrt( variance(array, options) )
+      Math.sqrt( variance(values, options) )
     end
 
-    def sum(array, identity = 0, &block)
-      return identity unless array.size > 0
+    # Calculates the sum from a set of values
+    def sum(values, identity = 0, &block)
+      return identity unless values.size > 0
 
       if block_given?
-        sum( array.map(&block) )
+        sum( values.map(&block) )
       else
-        array.inject { |sum, element| sum + element }
+        values.inject { |sum, element| sum + element }
       end
     end
 
     # Two pass algorithm is currently the only algo supported
     # http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance
-    def variance(array, options = {}, &block)
+    def variance(values, options = {}, &block)
       options = {:default => 0, :algo => :two_pass, :population => :infinite}.merge(options)
-      return options[:default] unless array.size > 0
+      return options[:default] unless values.size > 0
 
       if block_given?
-        return variance( array.map(&block), options )
+        return variance( values.map(&block), options )
       end
 
-      variance_two_pass(array, options)
+      variance_two_pass(values, options)
     end
 
-    def variance_two_pass(array, options)
-      n        = array.size
+    def variance_two_pass(values, options)
+      n        = values.size
       denom    = options[:population] == :infinite ? n - 1 : n
-      mean     = mean(array)
-      variance = array.inject(0) {|memo, element| memo + (element - mean)**2 } / denom
+      mean     = mean(values)
+      variance = values.inject(0) {|memo, element| memo + (element - mean)**2 } / denom
     end
 
+    # Convenience method for including Mathstats as a mixin.
+    #   Mathstats.attach_to(Array)
     def attach_to(klass)
       klass.send :include, Mixin
     end
